@@ -1,0 +1,37 @@
+FROM quay.io/deis/lightweight-docker-go:v0.2.0
+FROM debian:stretch
+COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+
+ARG BUNDLE_DIR
+
+
+# This is a template Dockerfile for the bundle's invocation image
+# You can customize it to use different base images, install tools and copy configuration files.
+#
+# Porter will use it as a template and append lines to it for the mixins
+# and to set the CMD appropriately for the CNAB specification.
+#
+# Add the following line to porter.yaml to instruct Porter to use this template
+# dockerfile: Dockerfile.tmpl
+
+# Use the BUNDLE_DIR build argument to copy files into the bundle
+
+# bring in wget
+# RUN  apt-get update 
+# RUN  apt-get install wget -y
+# RUN apt-get update && apt-get install -y curl
+# RUN rm -rf /var/lib/apt/lists/*
+
+# Bring in helm3
+RUN apt-get update && apt-get install -y curl
+RUN curl https://get.helm.sh/helm-v3.0.0-beta.3-linux-amd64.tar.gz --output helm3.tar.gz
+RUN tar -xvf helm3.tar.gz
+RUN mv linux-amd64/helm /usr/local/bin/helm3
+
+# bring in dapr
+# RUN wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash
+
+RUN helm3 repo add dapr https://daprio.azurecr.io/helm/v1/repo
+RUN helm3 repo update
+
+COPY . $BUNDLE_DIR
