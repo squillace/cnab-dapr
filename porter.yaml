@@ -10,36 +10,50 @@ invocationImage: squillace/dapr-install:latest
 tag: squillace/dapr-install:latest
 
 # Uncomment out the line below to use a template Dockerfile for your invocation image
-dockerfile: Dockerfile.tmpl
+# dockerfile: Dockerfile.tmpl
 
 mixins:
   - exec
+  - kubernetes
+  - helm3
 
 credentials:
 - name: KUBE_CONFIG
   path: /root/.kube/config
 
 parameters:
-- name: HELM_RELEASE
+- name: HELM3_RELEASE_NAME
   type: string
-  default: "whatever"  
+  default: "dapr"
   
-
 install:
-  - exec:
-      description: "Install Hello World"
-      command: bash
-      flags:
-        c: kubectl create namespace dapr-system
-  - exec:
-      description: "Installing dapr on cluster using Helm 3...."
-      command: helm3
+  - kubernetes:
+      description: "Creates the namespace..."
+      manifests:
+        - manifests/create-dapr-system-ns.yaml
+      wait: true
+  - helm3:
+      description: "Listing Helm3 releases..." 
+      arguments:
+        - list
+        - "-n"
+        - dapr-system
+  - helm3:
+      description: "Adding the dapr repo for Helm charts..."
+      arguments:
+        - repo
+        - add
+        - "{{ bundle.parameters.HELM3_RELEASE_NAME }}"
+        - https://daprio.azurecr.io/helm/v1/repo
+  - helm3:
+      description: "Installing dapr..."
       arguments:
         - install
         - dapr
         - dapr/dapr
         - "--namespace"
         - dapr-system
+
 
 
 upgrade:
@@ -50,11 +64,20 @@ upgrade:
         c: echo World 2.0
 
 uninstall:
+  - helm3:
+      description: "Uninstalling dapr..."
+      arguments:
+        - delete
+        - "{{ bundle.parameters.HELM3_RELEASE_NAME }}"
+        - "--namespace"
+        - dapr-system
   - exec:
-      description: "Uninstall Hello World"
-      command: bash
-      flags:
-        c: echo Goodbye World
+      description: "Removing the dapr-system namespace..."
+      command: kubectl
+      arguments:
+        - delete
+        - namespace
+        - dapr-system
 
 
 # See https://porter.sh/authoring-bundles/#dependencies

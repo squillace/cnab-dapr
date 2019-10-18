@@ -16,22 +16,4 @@ ARG BUNDLE_DIR
 
 # Use the BUNDLE_DIR build argument to copy files into the bundle
 
-# bring in wget
-# RUN  apt-get update 
-# RUN  apt-get install wget -y
-# RUN apt-get update && apt-get install -y curl
-# RUN rm -rf /var/lib/apt/lists/*
-
-# Bring in helm3
-RUN apt-get update && apt-get install -y curl
-RUN curl https://get.helm.sh/helm-v3.0.0-beta.3-linux-amd64.tar.gz --output helm3.tar.gz
-RUN tar -xvf helm3.tar.gz
-RUN mv linux-amd64/helm /usr/local/bin/helm3
-
-# bring in dapr
-# RUN wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash
-
-RUN helm3 repo add dapr https://daprio.azurecr.io/helm/v1/repo
-RUN helm3 repo update
-
-COPY . $BUNDLE_DIR
+# COPY . $BUNDLE_DIR
