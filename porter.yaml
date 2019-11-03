@@ -3,11 +3,11 @@
 # See https://porter.sh/authoring-bundles for documentation on how to configure your bundle
 # Uncomment out the sections below to take full advantage of what Porter can do!
 
-name: dapr-install
+name: dapr-cnab
 version: 0.1.0
-description: "An example Porter configuration"
-invocationImage: squillace/dapr-install:latest
-tag: squillace/dapr-install:latest
+description: "A Porter bundle that installs the Distributed App Runtime (https://dapr.io) and uninstalls the runtime, including CRDds."
+invocationImage: squillace/dapr-install:v0.1.0
+tag: squillace/dapr-cnab:v0.1.0
 
 # Uncomment out the line below to use a template Dockerfile for your invocation image
 # dockerfile: Dockerfile.tmpl
@@ -54,8 +54,6 @@ install:
         - "--namespace"
         - dapr-system
 
-
-
 upgrade:
   - exec:
       description: "World 2.0"
@@ -80,14 +78,3 @@ uninstall:
         - dapr-system
 
 
-# See https://porter.sh/authoring-bundles/#dependencies
-#dependencies:
-#  mysql:
-#    tag: deislabs/porter-mysql:latest
-#    parameters:
-#      database-name: wordpress
-
-# See https://porter.sh/wiring/#credentials
-#credentials:
-#  - name: kubeconfig
-#    path: /root/.kube/config
